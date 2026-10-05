@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أبناء الدكتور سراج رحمه الله - إدارة السكان والمدفوعات</title>
+    
+    <!-- إعدادات تطبيق الجوال PWA -->
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="أبناء د.سراج">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1018/1018265.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* تأثيرات إضافية */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-gray-800 p-4 md:p-8">
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full fade-in border border-gray-100">
+            <div class="text-center mb-6">
+                <div class="inline-block px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200/60 mb-3 shadow-sm">
+                    أبناء الدكتور سراج رحمه الله
+                </div>
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">تسجيل الدخول</h2>
+                <p class="text-xs text-gray-500 mt-1">يرجى إدخال بيانات الدخول المعتمدة للوصول للنظام</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div id="loginError" class="hidden bg-red-50 text-red-600 text-xs p-3 rounded-lg text-center font-semibold border border-red-100">
+                    اسم المستخدم أو كلمة المرور غير صحيحة!
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">اسم المستخدم</label>
+                    <input type="text" id="loginUsername" required dir="ltr" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-left" placeholder="aboserag">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                    <input type="password" id="loginPassword" required dir="ltr" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-left" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md hover:shadow-lg">
+                    دخول النظام
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center text-[11px] text-gray-400 font-medium">
+                تصميم محمد سراج
+            </div>
+        </div>
+    </div>
+
+    <!-- الحاوية الرئيسية للتطبيق -->
+    <div id="appContainer" class="max-w-6xl mx-auto hidden">
+        
+        <!-- عنوان التطبيق -->
+        <header class="bg-white rounded-xl shadow-md p-6 mb-8 text-center flex flex-col md:flex-row justify-between items-center border-t-4 border-amber-500">
+            <div>
+                <div class="text-xs font-bold text-amber-600 mb-1 flex items-center justify-center md:justify-start gap-1">
+                    <span>✨</span>
+                    <span>أبناء الدكتور سراج رحمه الله</span>
+                </div>
+                <h1 class="text-3xl font-bold text-indigo-700 mb-1">إدارة السكان والمدفوعات</h1>
+                <p class="text-gray-500 text-sm">تطبيق تفاعلي لحصر بيانات السكان والاشتراكات الشهرية</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3">
+            <!-- زر تثبيت التطبيق على الجوال -->
+            <button id="installPwaBtn" onclick="installPWA()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2 border border-indigo-500 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                تثبيت التطبيق
+            </button>
+            <button onclick="exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    تصدير (CSV)
+                </button>
+                <button onclick="handleLogout()" class="bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 border border-gray-200 font-semibold py-2 px-3 rounded-lg transition duration-200 flex items-center gap-1 text-sm" title="تسجيل الخروج">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    خروج
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- قسم إضافة/تعديل ساكن -->
+            <div class="lg:col-span-1 bg-white rounded-xl shadow-md p-6 h-fit">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2" id="formTitle">إضافة ساكن جديد</h2>
+                
+                <form id="residentForm" class="space-y-4">
+                    <input type="hidden" id="residentId">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">اسم الساكن</label>
+                        <input type="text" id="name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="الاسم ثلاثي">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">رقم الشقة / الوحدة</label>
+                        <input type="text" id="unit" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="مثال: شقة 12">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف</label>
+                        <input type="tel" id="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="01xxxxxxxxx">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">المبلغ الشهري</label>
+                            <input type="number" id="amount" required min="0" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">حالة الدفع (للشهر الحالي)</label>
+                            <select id="status" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="unpaid">لم يدفع</option>
+                                <option value="paid">تم الدفع</option>
+                                <option value="partial">دفع جزئي</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+                        <textarea id="notes" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none" placeholder="أي ملاحظات إضافية..."></textarea>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                            حفظ البيانات
+                        </button>
+                        <button type="button" onclick="resetForm()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition duration-200 hidden" id="cancelEditBtn">
+                            إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- قسم عرض البيانات (الجدول) -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6 overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                    <h2 class="text-xl font-semibold">سجل السكان</h2>
+                    
+                    <!-- شريط البحث -->
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ابحث بالاسم أو الشقة..." class="w-full pl-4 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-right text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 rounded-tr-lg">الوحدة</th>
+                                <th scope="col" class="px-4 py-3">الاسم</th>
+                                <th scope="col" class="px-4 py-3">المبلغ</th>
+                                <th scope="col" class="px-4 py-3 text-center">الحالة</th>
+                                <th scope="col" class="px-4 py-3 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="residentsTableBody">
+                            <!-- سيتم حقن الصفوف هنا بواسطة جافاسكريبت -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- إحصائيات سريعة -->
+                <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100" id="statsContainer">
+                    <!-- سيتم تحديث الإحصائيات هنا -->
+                </div>
+            </div>
+        </div>
+
+        <!-- تذييل الصفحة بحجم صغير -->
+        <footer class="mt-8 mb-2 text-center text-[11px] text-gray-400 font-medium">
+            تصميم محمد سراج
+        </footer>
+    </div>
+
+    <!-- نافذة تأكيد الحذف (Modal) -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl fade-in">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">تأكيد الحذف</h3>
+            <p class="text-gray-500 mb-6">هل أنت متأكد من حذف هذا الساكن؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">إلغاء</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">حذف</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- تهيئة البيانات ---
+        // نستخدم LocalStorage لمحاكاة قاعدة البيانات (أو صفحة جوجل شيت)
+        let residents = JSON.parse(localStorage.getItem('residentsData')) || [
+            // بيانات تجريبية مبدئية إذا كان التطبيق فارغاً
+            { id: '1', name: 'أحمد محمود', unit: 'شقة 1', phone: '01001234567', amount: 500, status: 'paid', notes: 'دفع مبكراً' },
+            { id: '2', name: 'محمد علي', unit: 'شقة 2', phone: '01119876543', amount: 500, status: 'unpaid', notes: 'وعد بالدفع الأسبوع القادم' },
+            { id: '3', name: 'سارة إبراهيم', unit: 'فيلا 1', phone: '01223344556', amount: 1200, status: 'partial', notes: 'تبقى 200 جنيه' }
+        ];
+
+        let deleteIdTarget = null; // متغير لتخزين المعرف المراد حذفه
+
+        // --- مصادقة وإدارة الدخول ---
+        const USERNAME_AUTH = 'aboserag';
+        const PASSWORD_AUTH = '861996';
+
+        function checkAuth() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const loginScreen = document.getElementById('loginScreen');
+            const appContainer = document.getElementById('appContainer');
+
+            if (isLoggedIn === 'true') {
+                loginScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                renderTable();
+            } else {
+                loginScreen.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const userVal = document.getElementById('loginUsername').value.trim();
+            const passVal = document.getElementById('loginPassword').value.trim();
+            const loginError = document.getElementById('loginError');
+
+            if (userVal === USERNAME_AUTH && passVal === PASSWORD_AUTH) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                loginError.classList.add('hidden');
+                checkAuth();
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('isLoggedIn');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+            checkAuth();
+        }
+
+        // --- عناصر DOM ---
+        const form = document.getElementById('residentForm');
+        const tableBody = document.getElementById('residentsTableBody');
+        const formTitle = document.getElementById('formTitle');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const searchInput = document.getElementById('searchInput');
+
+        // --- وظائف العرض والتحديث ---
+        function renderTable() {
+            tableBody.innerHTML = ''; // مسح الجدول الحالي
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            // فلترة البيانات بناءً على البحث
+            const filteredResidents = residents.filter(r => 
+                r.name.toLowerCase().includes(searchTerm) || 
+                r.unit.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredResidents.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">لا توجد بيانات مطابقة للبحث</td></tr>`;
+                updateStats();
+                return;
+            }
+
+            filteredResidents.forEach(resident => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50 transition duration-150 fade-in';
+                
+                // تحديد لون حالة الدفع
+                let statusBadge = '';
+                if(resident.status === 'paid') {
+                    statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">تم الدفع</span>';
+                } else if (resident.status === 'unpaid') {
+                    statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">لم يدفع</span>';
+                } else {
+                    statusBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">دفع جزئي</span>';
+                }
+
+                tr.innerHTML = `
+                    <td class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">${resident.unit}</td>
+                    <td class="px-4 py-4">
+                        <div class="font-medium text-gray-900">${resident.name}</div>
+                        ${resident.phone ? `<div class="text-xs text-gray-500 mt-1">${resident.phone}</div>` : ''}
+                    </td>
+                    <td class="px-4 py-4">${resident.amount} ج</td>
+                    <td class="px-4 py-4 text-center">${statusBadge}</td>
+                    <td class="px-4 py-4 text-center">
+                        <div class="flex justify-center gap-2">
+                            <button onclick="editResident('${resident.id}')" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-1.5 rounded-md" title="تعديل">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </button>
+                            <button onclick="openDeleteModal('${resident.id}')" class="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-md" title="حذف">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                // إضافة الملاحظات كصف منسدل إذا وجدت
+                if(resident.notes && resident.notes.trim() !== '') {
+                   const notesTr = document.createElement('tr');
+                   notesTr.className = 'border-b bg-gray-50/50';
+                   notesTr.innerHTML = `
+                       <td colspan="5" class="px-4 py-2 text-xs text-gray-500">
+                           <span class="font-semibold text-gray-600">ملاحظة:</span> ${resident.notes}
+                       </td>
+                   `;
+                   tableBody.appendChild(tr);
+                   tableBody.appendChild(notesTr);
+                } else {
+                   tableBody.appendChild(tr);
+                }
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            
+            const totalUnits = residents.length;
+            const paidCount = residents.filter(r => r.status === 'paid').length;
+            const unpaidCount = residents.filter(r => r.status === 'unpaid').length;
+            
+            let expectedIncome = 0;
+            let collectedIncome = 0;
+
+            residents.forEach(r => {
+                const amt = parseFloat(r.amount) || 0;
+                expectedIncome += amt;
+                if (r.status === 'paid') {
+                    collectedIncome += amt;
+                } else if (r.status === 'partial') {
+                    // تبسيط: نعتبر الدفع الجزئي نصف المبلغ للإحصائيات أو يمكن إضافة حقل خاص للمبلغ المدفوع
+                    collectedIncome += (amt / 2); 
+                }
+            });
+
+            statsContainer.innerHTML = `
+                <div class="bg-blue-50 p-3 rounded-lg text-center border border-blue-100">
+                    <div class="text-xs text-blue-600 font-semibold mb-1">إجمالي الوحدات</div>
+                    <div class="text-xl font-bold text-blue-800">${totalUnits}</div>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg text-center border border-green-100">
+                    <div class="text-xs text-green-600 font-semibold mb-1">تم الدفع (وحدات)</div>
+                    <div class="text-xl font-bold text-green-800">${paidCount}</div>
+                </div>
+                <div class="bg-red-50 p-3 rounded-lg text-center border border-red-100">
+                    <div class="text-xs text-red-600 font-semibold mb-1">لم يدفع (وحدات)</div>
+                    <div class="text-xl font-bold text-red-800">${unpaidCount}</div>
+                </div>
+                <div class="bg-indigo-50 p-3 rounded-lg text-center border border-indigo-100">
+                    <div class="text-xs text-indigo-600 font-semibold mb-1">التحصيل التقديري</div>
+                    <div class="text-xl font-bold text-indigo-800">${collectedIncome} <span class="text-sm font-normal">من ${expectedIncome}</span></div>
+                </div>
+            `;
+        }
+
+        // --- معالجة الإدخال (Form Submit) ---
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('residentId').value;
+            const name = document.getElementById('name').value;
+            const unit = document.getElementById('unit').value;
+            const phone = document.getElementById('phone').value;
+            const amount = document.getElementById('amount').value;
+            const status = document.getElementById('status').value;
+            const notes = document.getElementById('notes').value;
+
+            const residentData = {
+                id: id ? id : Date.now().toString(), // إنشاء ID جديد إذا لم يكن هناك تعديل
+                name,
+                unit,
+                phone,
+                amount,
+                status,
+                notes
+            };
+
+            if (id) {
+                // وضع التعديل (Update)
+                const index = residents.findIndex(r => r.id === id);
+                if (index !== -1) {
+                    residents[index] = residentData;
+                }
+            } else {
+                // وضع الإضافة (Create)
+                residents.push(residentData);
+            }
+
+            saveData();
+            resetForm();
+            renderTable();
+            
+            // إظهار رسالة نجاح بسيطة
+            showMessage(id ? 'تم تحديث البيانات بنجاح' : 'تمت إضافة الساكن بنجاح', 'success');
+        });
+
+        // --- التعديل (Edit) ---
+        function editResident(id) {
+            const resident = residents.find(r => r.id === id);
+            if (!resident) return;
+
+            document.getElementById('residentId').value = resident.id;
+            document.getElementById('name').value = resident.name;
+            document.getElementById('unit').value = resident.unit;
+            document.getElementById('phone').value = resident.phone || '';
+            document.getElementById('amount').value = resident.amount;
+            document.getElementById('status').value = resident.status;
+            document.getElementById('notes').value = resident.notes || '';
+
+            formTitle.textContent = 'تعديل بيانات الساكن';
+            cancelEditBtn.classList.remove('hidden');
+            
+            // التمرير إلى النموذج
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // --- إعادة ضبط النموذج ---
+        function resetForm() {
+            form.reset();
+            document.getElementById('residentId').value = '';
+            formTitle.textContent = 'إضافة ساكن جديد';
+            cancelEditBtn.classList.add('hidden');
+        }
+
+        // --- الحذف (Delete) ---
+        function openDeleteModal(id) {
+            deleteIdTarget = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            deleteIdTarget = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (deleteIdTarget) {
+                residents = residents.filter(r => r.id !== deleteIdTarget);
+                saveData();
+                renderTable();
+                closeDeleteModal();
+                showMessage('تم حذف الساكن بنجاح', 'error'); // نستخدم لون الخطأ للدلالة على الحذف
+                
+                // إذا كنا نقوم بتعديل نفس العنصر المحذوف، نقوم بمسح النموذج
+                if(document.getElementById('residentId').value === deleteIdTarget) {
+                    resetForm();
+                }
+            }
+        });
+
+        // --- البحث والفلترة ---
+        function filterTable() {
+            renderTable(); // renderTable تتعامل مع قيمة searchInput
+        }
+
+        // --- حفظ البيانات محلياً (Local Storage) ---
+        function saveData() {
+            localStorage.setItem('residentsData', JSON.stringify(residents));
+        }
+
+        // --- عرض رسائل تنبيه (Toast بسيط) ---
+        function showMessage(msg, type = 'success') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+            toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg fade-in z-50 flex items-center gap-2`;
+            toast.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                ${msg}
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- تصدير البيانات إلى ملف CSV (يُسهل نقلها لجوجل شيت) ---
+        function exportToCSV() {
+            if (residents.length === 0) {
+                alert("لا توجد بيانات للتصدير");
+                return;
+            }
+
+            // رأس الجدول
+            const headers = ['الوحدة', 'الاسم', 'رقم الهاتف', 'المبلغ', 'الحالة', 'ملاحظات'];
+            
+            // ترجمة الحالات
+            const statusMap = {
+                'paid': 'تم الدفع',
+                'unpaid': 'لم يدفع',
+                'partial': 'دفع جزئي'
+            };
+
+            // تحويل البيانات لصفوف
+            const csvRows = [];
+            csvRows.push(headers.join(',')); // إضافة الرأس
+
+            for (const row of residents) {
+                const values = [
+                    `"${row.unit}"`,
+                    `"${row.name}"`,
+                    `"${row.phone || ''}"`,
+                    row.amount,
+                    `"${statusMap[row.status] || row.status}"`,
+                    `"${(row.notes || '').replace(/"/g, '""')}"` // معالجة علامات التنصيص في الملاحظات
+                ];
+                csvRows.push(values.join(','));
+            }
+
+            const csvData = csvRows.join('\n');
+            // إضافة BOM لدعم اللغة العربية في Excel
+            const blob = new Blob(["\uFEFF" + csvData], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `سجل_السكان_${new Date().toLocaleDateString('ar-EG')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // --- إعدادات PWA (تحويل الصفحات لتطبيق جوال قابل للتثبيت) ---
+    const manifestData = {
+        name: "أبناء الدكتور سراج - إدارة السكان",
+        short_name: "أبناء د.سراج",
+        description: "تطبيق حصر بيانات السكان والاشتراكات الشهرية",
+        start_url: "./",
+        display: "standalone",
+        background_color: "#f3f4f6",
+        theme_color: "#4f46e5",
+        icons: [
+            {
+                src: "https://cdn-icons-png.flaticon.com/512/1018/1018265.png",
+                sizes: "512x512",
+                type: "image/png",
+                purpose: "any maskable"
+            }
+        ]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = manifestURL;
+    document.head.appendChild(manifestLink);
+
+    // تسجيل Service Worker ليعمل كـ Progressive Web App
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+            self.addEventListener('install', (e) => self.skipWaiting());
+            self.addEventListener('activate', (e) => self.clients.claim());
+            self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+        `;
+        const swBlob = new Blob([swCode], {type: 'application/javascript'});
+        const swURL = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swURL).catch(err => console.log('SW Error', err));
+    }
+
+    // التعامل مع زر تثبيت التطبيق على الجوال والكمبيوتر
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('installPwaBtn');
+        if (installBtn) installBtn.classList.remove('hidden');
+    });
+
+    function installPWA() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    document.getElementById('installPwaBtn').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            });
+        }
+    }
+
+    // --- بدء التطبيق ---
+    // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
+    checkAuth();
+</script>
+</body>
+</html>
